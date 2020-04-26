@@ -1,39 +1,27 @@
 """
-This is the class for the sprite class
+This is the class for created player sprites
 """
 
 import arcade
-import os
-import math
-
-# the size of the sprite
-SPRITE_SCALING = 0.5
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
-MOVEMENT_SPEED = 5
-ANGLE_SPEED = 5
 
 class Player( arcade.Sprite ):
     """ Player class """
 
-    def __init__( self, image, scale ):
-        """ set up the player """
+   def update(self):
+        # the center changes based on displacement by x or y
+        self.center_x += self.change_x
+        self.center_y += self.change_y
 
-        # Call the parent init
-        super().__init__(image, scale )
+        # these are used to avoid if the sprite moves too far
+        # in either the right or left
+        if self.left < 0:
+            self.left = 0
+        elif self.right > SCREEN_WIDTH - 1:
+            self.right = SCREEN_WIDTH - 1
 
-        # create a variable to hold our speed+
-        self.speed = 0
-
-    def update(self):
-        #convert angle in degrees to radians
-        angle_rad = math.radians(self.angle)
-
-        #rotate the ship
-        self.angle += self.change_angle
-
-        # use math to find our change based on speed and angle
-        self.center_x += -self.speed * math.sin(angle_rad)
-        self.center_y += slef.speed * math.cos(angle_rad )
+        # these are used to avoid if the sprite moves too far
+        # in either the top or bottom
+        if self.bottom < 0:
+            self.bottom = 0
+        elif self.top > SCREEN_HEIGHT - 1:
+            self.top = SCREEN_HEIGHT - 1
