@@ -54,10 +54,18 @@ class MyGame( arcade.Window ):
 
         # Set up the player
 
-        self.player_sprite = Player(":resources:images/space_shooter/playerShip1_orange.png" )
+        self.player_sprite = Player( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\airship.png" )
         # this is the starting position of the player
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = 50
+                                    
+        # updated dimensions of sprite
+        self.player_sprite.height = 200
+        self.player_sprite.width = 200
+
+        # this controls the dimensions of the hit_box
+                                        # LOWER L   LOWER R    UPPER R   UPPER L
+        self.player_sprite.set_hit_box([[-60, -50], [38, -50], [38, 38], [-60, 38]])
 
         # the sprite is then appended to a list of all players
         self.player_list.append( self.player_sprite )
@@ -75,6 +83,10 @@ class MyGame( arcade.Window ):
 
          # call draw() on all sprite lists below
         self.player_list.draw()
+        
+        # draws border for hit box
+        # self.player_sprite.draw_hit_box( line_thickness = 5 )
+                                    
         self.bullet_list.draw()
 
     def on_update( self, delta_time):
@@ -135,17 +147,18 @@ class MyGame( arcade.Window ):
         # if the key pressed is the spacebar, the player shoots up
         if key == arcade.key.SPACE:
             
-            bullet = arcade.Sprite( ":resources:images/space_shooter/laserBlue01.png",
+            bullet = arcade.Sprite( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\missle.png",
                                      SPRITE_SCALING_LASER )
 
-            # changing the bullet angle to start at 90, upwards
-            bullet.angle = 90
+            # chnaged the size of the bullet
+            bullet.height = 200
+            bullet.width = 100
 
             # the change in y is equal to the bullet speed set
             bullet.change_y = BULLET_SPEED
 
             # position of the bullet
-            bullet.center_x = self.player_sprite.center_x
+            bullet.center_x = self.player_sprite.center_x - 9
             bullet.bottom = self.player_sprite.top
 
             # add the bullet to it's list once more
