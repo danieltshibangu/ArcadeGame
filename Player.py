@@ -4,6 +4,9 @@ This is the class for created player sprites
 
 import arcade
 
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 800
+
 class Player( arcade.Sprite ):
     """ Player class """
 
