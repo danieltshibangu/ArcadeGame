@@ -1,17 +1,23 @@
+"""
+Starting Template
+"""
+
 import arcade
 from player import Player
 from Explosion import Explosion
+import Enemy
 import os
 from arcade.draw_commands import Texture
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
+ 
 SCREEN_TITLE = "GALAGA!"
 
-# defines size of the model
+# describes size of the model
 SPRITE_SCALING = 0.5
 
-# defines speed of sprite movement
+# describes speed of sprite movement
 MOVEMENT_SPEED = 10
 
 # this deals with shooting
@@ -21,16 +27,31 @@ BULLET_SPEED = 10
 # gives explosion a texture count
 EXPLOSION_TEXTURE_COUNT = 60
 
-class MyGame( arcade.Window ):
+class Enemy( arcade.Sprite ):
+
+    '''
+    This function will move the current spites in
+    different directions.
+    '''
+
+    def update( self ):
+        # the center changes based on displacement by x or y
+        self.center_x -= 15
+
+
+class MyGame( arcade.View ):
     """
     Main application class
     """
-    def __init__( self, width, height, title ):
-        super().__init__(width, height, title )
-        
+    def __init__(self):
+        super().__init__()
+
+        # background image will be stored in here
+        self.background = None
+
         # initiate the frame count here
         self.frame_count = 0
-        
+
         # variables that will hold sprite lists
         self.player_list = None
         self.bullet_list = None
@@ -47,7 +68,7 @@ class MyGame( arcade.Window ):
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
-        
+
         # preload the animation frames
         self.explosion_texture_list = []
 
@@ -62,49 +83,65 @@ class MyGame( arcade.Window ):
                                       sprite_width, sprite_height,
                                       columns, count)
 
+
         #add gun sounds here
         """
         self.gun_sound = arcade.load_sound( "some resource" )
         self.hit_sound = arcade.load_sound( "some resource" )
         """
+
         
+
         # sets the background color
         arcade.set_background_color( arcade.color.AMAZON )
-      
+
+
+
     def setup(self):
-        #create your sprites and sprite lists here
+
+        #loading wallpaper image here
+        self.background = arcade.load_texture( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\galaga background.jpg" )
+
         # Sprite lists
         self.player_list = arcade.SpriteList()
-        self.bullet_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
+        self.bullet_list = arcade.SpriteList()
         self.explosions_list = arcade.SpriteList() 
+        
 
-        # Set up the player
-        self.score = 0
-        self.player_sprite = Player( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\airship.png" )
+        # SET UP THE PLAYER
+        self.score = 0 
+        self.player_sprite = Player( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\galagaShip.png" )
+
+        #self.player_sprite = Player( ":resources:images/space_shooter/playerShip1_orange.png" )
         # this is the starting position of the player
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = 50
-                                    
+
         # updated dimensions of sprite
-        self.player_sprite.height = 200
-        self.player_sprite.width = 200
+        self.player_sprite.height = 50 
+        self.player_sprite.width = 50
 
         # this controls the dimensions of the hit_box
-                                        # LOWER L   LOWER R    UPPER R   UPPER L
+                                        # LOWER L     LOWER R   UPPER R  UPPER L
         self.player_sprite.set_hit_box([[-60, -50], [38, -50], [38, 38], [-60, 38]])
+        
 
         # the sprite is then appended to a list of all players
         self.player_list.append( self.player_sprite )
-        
+
+
         # SET UP THE ENEMIES
-        enemy = arcade.Sprite( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\galaga-ship-png-4.png" )
-        enemy.height = 200
-        enemy.width = 200
-        enemy.center_x = 120
-        enemy.center_y = SCREEN_HEIGHT - enemy.height
-        enemy.angle = 180
-        self.enemy_list.append(enemy)
+        for i in range( 5 ):
+            
+            enemy = arcade.Sprite( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\galaga-ship-png-4.png" )
+            enemy.height = 90
+            enemy.width = 90
+            enemy.center_x = SCREEN_WIDTH/2
+            enemy.center_y = SCREEN_HEIGHT - (enemy.height/2) 
+            enemy.angle = 180
+            self.enemy_list.append(enemy)
+        
 
     def on_draw( self ):
         """
@@ -113,21 +150,16 @@ class MyGame( arcade.Window ):
 
         # This command should be open before drawing.
         # it will clear the screen to bg color, and erase
-        # last drawn. It also gives permission for other things
-        # to be drawn 
+        # last drawn
         arcade.start_render()
 
-         # call draw() on all sprite lists below
-        self.player_list.draw()
         
-        # draws border for hit box
-        # self.player_sprite.draw_hit_box( line_thickness = 5 )
-        
-        # creates a rectangle the size of screen to contain image?
+        # this renders the background to fit within the given screen dimensions
         arcade.draw_lrwh_rectangle_textured(0, 0,
                                             SCREEN_WIDTH, SCREEN_HEIGHT,
                                             self.background)
-                                    
+        
+
         # call draw() on all sprite lists below
         self.player_list.draw()
         self.enemy_list.draw()
@@ -140,6 +172,7 @@ class MyGame( arcade.Window ):
         # render the text for score
         arcade.draw_text( f"Score: {self.score}", 10, 20,
                           arcade.color.WHITE, 14 )
+        
 
     def on_update( self, delta_time):
         """
@@ -147,6 +180,7 @@ class MyGame( arcade.Window ):
         Normally, you'll call update() on the sprite lists
         that need it.
         """
+
         # calculate speed based on keys pressed
         # initiates change in sprite position to 0
         self.player_sprite.change_x = 0
@@ -167,15 +201,18 @@ class MyGame( arcade.Window ):
 
         # call update on bullet sprites
         self.bullet_list.update()
-        
+
         # call update on explosions
         self.explosions_list.update()
-        
-        # ENEMY MOVEMENT AND ATTACK LOGIC 
+
+
+        # ENEMY MOVEMENT AND ATTACK LOGIC
+       
+                    
 
         # initializing the frame count to 1
         self.frame_count += 1
-        
+
         # loop through each enemy
         for enemy in self.enemy_list:
 
@@ -193,11 +230,17 @@ class MyGame( arcade.Window ):
                 bullet.change_y = -2
                 self.bullet_list.append(bullet)
 
+                # enemy movement
+                enemy.center_x = 100
+                        
+
         # loop through each bullet
         for bullet in self.bullet_list:
 
             #Check this bullet to see if it hit something
-            hit_list = arcade.check_for_collision_with_list( bullet, self.a_list )
+            
+            hit_list = arcade.check_for_collision_with_list( bullet, self.enemy_list )
+            
             
             # if there was a collision
             if len( hit_list ) > 0:
@@ -218,24 +261,26 @@ class MyGame( arcade.Window ):
 
                 # get rid of the bullet
                 bullet.remove_from_sprite_lists()
-                
+
+
             # for each enemy we hit, add to score andremove enemy
             for enemy in self.enemy_list:
                 if enemy in hit_list:
                     enemy.remove_from_sprite_lists()
                     bullet.remove_from_sprite_lists()
                     self.score += 1
-                
 
-            # if the bullet flies of the screen it must be removed
+             # if the bullet flies of the screen it must be removed
             if bullet.bottom > SCREEN_HEIGHT:
                 bullet.remove_from_sprite_lists()
+
+                
 
     def on_key_press( self, key, key_modifiers):
         """
         Called whenever a key on the keyboard is pressed
         """
-        
+
         # when a key is pressed, the movement is registered as True
         # and position gets updated
         if key == arcade.key.UP:
@@ -253,7 +298,7 @@ class MyGame( arcade.Window ):
             bullet = arcade.Sprite( r"C:\Users\Daniel Tshibangu\Desktop\galaga\Resources\missle.png",
                                      SPRITE_SCALING_LASER )
 
-            # changed the size of the bullet
+            # changing the bullet angle to start at 90, upwards
             bullet.height = 200
             bullet.width = 100
 
@@ -264,13 +309,15 @@ class MyGame( arcade.Window ):
             bullet.center_x = self.player_sprite.center_x 
             bullet.bottom = self.player_sprite.top - 2
 
-            # add the bullet to it's list once more
+            # add the bullet to it's list once mo re
             self.bullet_list.append(bullet)
+            
 
     def on_key_release( self, key, key_modifiers):
         """
         Called whenever the user lets off a previously pressed key.
         """
+
         if key == arcade.key.UP:
             self.up_pressed = False
         elif key == arcade.key.DOWN:
@@ -279,14 +326,21 @@ class MyGame( arcade.Window ):
             self.left_pressed = False
         elif key == arcade.key.RIGHT:
             self.right_pressed = False
-
+            
 
 def main():
     """ Main method """
-    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()
+    window = arcade.Window( SCREEN_WIDTH, SCREEN_HEIGHT, "INTRO" )
+
+
+    # this will help to avoid a circular import  
+    from MenuView import MenuDisplay
+    menu_view = MenuDisplay()
+    
+    window.show_view( menu_view )
     arcade.run()
 
 
 if __name__ == "__main__":
     main()
+   
